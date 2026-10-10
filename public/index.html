@@ -118,7 +118,8 @@ label.toggle input:checked::after{transform:translateX(18px)}
 .chart .ln{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
 .chart .pt{fill:var(--accent)}
 .chart .end{fill:var(--accent);stroke:var(--well);stroke-width:2}
-.chart .cross{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.chart .cross{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;visibility:hidden}
+.chart .cross.on{visibility:visible}
 .chart .empty{padding:24px 8px;text-align:center;color:var(--muted);font-size:14px}
 .tip{position:absolute;pointer-events:none;background:var(--bg);box-shadow:var(--raise-sm);border-radius:10px;padding:6px 10px;font-size:12px;white-space:nowrap;transform:translate(-50%,-110%);z-index:2}
 .tip b{font-variant-numeric:tabular-nums}
@@ -299,7 +300,7 @@ async function load(){
   loading=false;$('#refresh').disabled=false;$('#refresh').textContent='새로고침';
 }
 
-const td=(label,html,cls)=>'<td data-label="'+label+'"'+(cls?' class="'+cls+'"':'')+'>'+html+'</td>';
+const td=(label,html,cls)=>'<td data-label="'+label+'"'+(cls?' class="'+cls+'"':'')+'><div>'+html+'</div></td>';
 const isMastered=e=>e.status==='Mastered'||((e.passedStage||0)>=4&&(e.transferDates||0)>=3&&(e.transferContexts||0)>=2&&e.status!=='Relearning');
 const nextDue=e=>{if(e.retryDate)return d10(e.retryDate);const s=e.passedStage||0;if(s>=4||!e.firstLearned)return null;return addDays(e.firstLearned,STAGES[s])};
 
@@ -408,12 +409,12 @@ function bindHover(card){
   const move=ev=>{
     const r=svg.getBoundingClientRect(),sx=(ev.clientX-r.left)/r.width*W;
     let best=pts[0];for(const p of pts)if(Math.abs(p[0]-sx)<Math.abs(best[0]-sx))best=p;
-    cross.setAttribute('x1',best[0]);cross.setAttribute('x2',best[0]);
+    cross.setAttribute('x1',best[0]);cross.setAttribute('x2',best[0]);cross.classList.add('on');
     const cr=card.getBoundingClientRect();
     tip.innerHTML=esc(md(best[2]))+' · <b>'+esc(best[3])+'</b>';tip.hidden=false;
     tip.style.left=(r.left-cr.left+best[0]/W*r.width)+'px';tip.style.top=(r.top-cr.top+best[1]/H*r.height)+'px';
   };
-  const out=()=>{tip.hidden=true;cross.setAttribute('x1',-10);cross.setAttribute('x2',-10)};
+  const out=()=>{tip.hidden=true;cross.classList.remove('on')};
   svg.addEventListener('pointermove',move);svg.addEventListener('pointerdown',move);svg.addEventListener('pointerleave',out);
 }
 

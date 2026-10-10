@@ -66,6 +66,20 @@ GitHub Actions (30분마다 / 수동 실행)
 | `Notion 404 object_not_found` | 1-4 단계(허브 페이지에 통합 연결)를 했는지 |
 | 자동 갱신이 멈춤 | GitHub는 **60일 동안 저장소에 활동이 없으면 예약 실행을 끕니다.** Actions 탭에서 다시 켜거나 아무 커밋이나 하나 올리세요. |
 
+## 새 기능이 쓰는 데이터
+| 화면 | 필요한 기록 (Daily Lessons / Expression Bank) |
+|---|---|
+| 오늘의 복습 | 표현의 First Learned · Passed Stage · Retry Date · Prompt · Example, 레슨 본문의 `Original:` / `Natural Version:` / `Why:` 줄 |
+| 실력 변화 · 문법 정확도 | 레슨의 **Accuracy** (0–100) |
+| 실력 변화 · 어휘 다양성 / 답변 확장 / 표현 재사용률 | 레슨 본문의 `Learner:` 로 시작하는 내 발화 (자동 계산) |
+| 반복되는 약점 | 레슨의 **Error Types** (관사, 시제, 전치사 …) |
+| 나의 교재 | 표현의 Status · Passed Stage · Transfer Dates · Transfer Contexts |
+
+- 어휘 다양성: 50단어 창의 서로 다른 단어 비율 평균(MATTR). 답변 길이에 덜 흔들립니다.
+- 답변 확장: 내 발화 1회당 평균 단어 수.
+- 표현 재사용률: 이 레슨 이전에 배운 표현 중 이번 대화에서 다시 쓴 비율.
+- 화면 구성만 보고 싶으면 주소 뒤에 `?demo=1` 을 붙이세요. 가상 예시 데이터로 표시됩니다.
+
 ## 집계 규칙
 - 실제 레슨·학습시간: Status = **Complete** 인 레슨만
 - 무힌트 전이·D14 유지율: Status = **Assessed** 이고 Evidence·Actual·Score가 있는 복습만
