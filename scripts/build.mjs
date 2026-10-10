@@ -50,6 +50,7 @@ function value(p) {
     case 'title': return plain(p.title);
     case 'rich_text': return plain(p.rich_text);
     case 'select': return p.select?.name ?? null;
+    case 'multi_select': return (p.multi_select || []).map(o => o.name);
     case 'status': return p.status?.name ?? null;
     case 'number': return p.number;
     case 'checkbox': return p.checkbox;
@@ -83,25 +84,88 @@ async function blocks(id, depth = 0) {
   return out;
 }
 
-const [lessonPages, exprPages, reviewPages] = [
-  await queryAll(DS.lessons, [{ property: 'Date', direction: 'descending' }]),
-  await queryAll(DS.expressions, [{ property: 'First Learned', direction: 'descending' }]),
-  await queryAll(DS.reviews, [{ property: 'Scheduled', direction: 'ascending' }]),
-];
+// ── 레슨 본문 분석 ──────────────────────────────────────────────
+// 학습자 발화: "Learner:" / "Me:" / "나:" 로 시작하는 줄
+const LEARNER = /^\s*(learner|me|나|학습자)\s*[:：]\s*/i;
+const words = s => (s.toLowerCase().match(/[a-z]+(?:'[a-z]+)?/g) || []);
 
-const lessons = [];
-for (const page of lessonPages) {
-  const l = { id: page.id, url: page.url, ...props(page, [['title', 'Lesson'], ['status', 'Status'], ['area', 'Area'], ['mode', 'Mode'], ['date', 'Date'], ['minutes', 'Minutes'], ['speakingMinutes', 'Speaking Minutes'], ['sessionKey', 'Session Key']]) };
-  l.body = l.status === 'Template' ? [] : await blocks(page.id);
-  lessons.push(l);
+// MATTR(이동 평균 어휘 다양도): 50단어 창마다 서로 다른 단어 비율을 구해 평균. 답변 길이에 덜 흔들린다.
+function mattr(tokens, win = 50) {
+  if (tokens.length < 10) return null;
+  if (tokens.length <= win) return new Set(tokens).size / tokens.length;
+  let sum = 0, n = 0;
+  for (let i = 0; i + win <= tokens.length; i++, n++) sum += new Set(tokens.slice(i, i + win)).size / win;
+  return sum / n;
 }
+
+// 표현 제목에서 실제로 말할 단어만 뽑아 느슨한 정규식으로 만든다. ("end up + -ing" → end\w* … up\w*)
+const FILLER = new Set(['sb', 'sth', 'someone', 'something', 'ing', 'one', 's']);
+function expressionPattern(title) {
+  const ws = words(String(title).replace(/\[[^\]]*\]|\\/g, ' ')).filter(w => !FILLER.has(w));
+  if (!ws.length) return null;
+  return new RegExp('\\b' + ws.map(w => w + '\\w*').join("(?:\\W+[\\w']+){0,2}?\\W+") + '\\b', 'i');
+}
+
+// 교정 블록: Original / Natural Version / Why 줄을 묶는다.
+function corrections(body) {
+  const out = [];
+  let heading = '', cur = null;
+  for (const b of body) {
+    if (b.t === 'h') { heading = b.text; continue; }
+    const m = b.text.match(/^\s*(Original|원문|Natural Version|자연스러운 표현|Why|이유)\s*[:：]\s*(.*)$/is);
+    if (!m) continue;
+    const key = m[1].toLowerCase();
+    if (key === 'original' || key === '원문') { cur = { heading, original: m[2].trim() }; out.push(cur); }
+    else if (cur && (key.startsWith('natural') || key === '자연스러운 표현')) cur.natural = m[2].trim();
+    else if (cur) cur.why = m[2].trim();
+  }
+  return out.filter(c => c.original);
+}
+
+function analyze(lesson, expressionsBefore) {
+  const lines = lesson.body.filter(b => LEARNER.test(b.text)).map(b => b.text.replace(LEARNER, ''));
+  const tokens = lines.flatMap(words);
+  const text = lines.join('\n');
+  const matched = expressionsBefore.filter(e => e.pattern && e.pattern.test(text)).map(e => e.title);
+  return {
+    learnerTurns: lines.length,
+    learnerWords: tokens.length,
+    vocabDiversity: mattr(tokens),
+    expansion: lines.length ? tokens.length / lines.length : null,
+    reuseBase: expressionsBefore.length,
+    reuseMatched: matched,
+    reuseRate: expressionsBefore.length ? matched.length / expressionsBefore.length : null,
+  };
+}
+
+// ── 읽기 ────────────────────────────────────────────────────────
+const lessonPages = await queryAll(DS.lessons, [{ property: 'Date', direction: 'descending' }]);
+const exprPages = await queryAll(DS.expressions, [{ property: 'First Learned', direction: 'descending' }]);
+const reviewPages = await queryAll(DS.reviews, [{ property: 'Scheduled', direction: 'ascending' }]);
+
 const expressions = exprPages.map(page => ({ id: page.id, url: page.url, ...props(page, [
-  ['title', 'Expression'], ['status', 'Status'], ['meaning', 'Meaning'], ['example', 'Example'], ['register', 'Register'],
-  ['firstLearned', 'First Learned'], ['retryDate', 'Retry Date'], ['passedStage', 'Passed Stage'],
-  ['transferDates', 'Transfer Dates'], ['transferContexts', 'Transfer Contexts'], ['nextReview', 'Next Review'], ['mastery', 'Mastery']]) }));
+  ['title', 'Expression'], ['status', 'Status'], ['meaning', 'Meaning'], ['example', 'Example'], ['prompt', 'Prompt'],
+  ['original', 'Original'], ['register', 'Register'], ['firstLearned', 'First Learned'], ['retryDate', 'Retry Date'],
+  ['passedStage', 'Passed Stage'], ['transferDates', 'Transfer Dates'], ['transferContexts', 'Transfer Contexts'],
+  ['nextReview', 'Next Review'], ['mastery', 'Mastery']]) }));
 const reviews = reviewPages.map(page => ({ id: page.id, url: page.url, ...props(page, [
   ['title', 'Review'], ['status', 'Status'], ['stage', 'Stage'], ['scheduled', 'Scheduled'], ['actual', 'Actual'],
-  ['score', 'Score'], ['hintUsed', 'Hint Used'], ['evidence', 'Evidence']]) }));
+  ['score', 'Score'], ['hintUsed', 'Hint Used'], ['evidence', 'Evidence'], ['expression', 'Expression']]) }));
+
+const patterns = expressions.filter(e => e.status !== 'Template').map(e => ({ ...e, pattern: expressionPattern(e.title) }));
+const lessons = [];
+for (const page of lessonPages) {
+  const l = { id: page.id, url: page.url, ...props(page, [
+    ['title', 'Lesson'], ['status', 'Status'], ['area', 'Area'], ['mode', 'Mode'], ['date', 'Date'], ['minutes', 'Minutes'],
+    ['speakingMinutes', 'Speaking Minutes'], ['sessionKey', 'Session Key'], ['accuracy', 'Accuracy'], ['fluency', 'Fluency'],
+    ['coherence', 'Coherence'], ['appropriacy', 'Appropriacy'], ['errorTypes', 'Error Types']]) };
+  l.body = l.status === 'Template' ? [] : await blocks(page.id);
+  // 재사용률은 이 레슨 이전에 배운 표현만 기준으로 센다. 샘플 레슨은 샘플 표현끼리, 실제 레슨은 실제 표현끼리 비교한다.
+  const before = patterns.filter(e => e.firstLearned && l.date && e.firstLearned.slice(0, 10) < l.date.slice(0, 10) && (e.status === 'Sample') === (l.status === 'Sample'));
+  l.analysis = analyze(l, before);
+  l.corrections = corrections(l.body);
+  lessons.push(l);
+}
 
 await mkdir('public', { recursive: true });
 await writeFile('public/data.json', JSON.stringify({ generatedAt: new Date().toISOString(), lessons, expressions, reviews }));
