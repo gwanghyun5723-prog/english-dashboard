@@ -4,37 +4,38 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#e4e9e5" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1d2420" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15191c" media="(prefers-color-scheme: dark)">
 <title>영어 학습 스튜디오</title>
+<script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
 <style>
-/* Layout: one soft clay column. Raised surfaces for things you read, inset wells for things you type or that hold values. */
+/* Layout: one reading column. Day = paper (warm off-white, ink text, hairline cards). Night = dim (blue-grey, not pure black). */
 :root{
-  --bg:#e4e9e5; --fg:#1f2f27; --muted:#56665c; --accent:#2c6a4c; --accent-2:#5f9a78;
-  --hi:#ffffff; --lo:#bec8c1; --well:#dde3de; --line:#cfd8d1;
-  --warn:#9a5b12; --warn-soft:#f1e3cf; --bad:#a83a2c; --bad-soft:#f1d9d4; --ok:#2c6a4c;
+  --bg:#f8f7f3; --surface:#ffffff; --fg:#1c1c1a; --muted:#5b5a55; --accent:#1f5c43; --accent-2:#6a9b81;
+  --well:#f3f1ec; --line:#e3e0d8;
+  --warn:#8a5a12; --warn-soft:#f6ead6; --bad:#a83a2c; --bad-soft:#f6dfdb; --ok:#1f5c43;
   --display:"Gowun Batang",Georgia,serif;
   --body:"IBM Plex Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-  --r-lg:22px; --r-md:16px; --r-sm:12px;
-  --raise:7px 7px 16px var(--lo),-7px -7px 16px var(--hi);
-  --raise-sm:4px 4px 9px var(--lo),-4px -4px 9px var(--hi);
-  --inset:inset 4px 4px 9px var(--lo),inset -4px -4px 9px var(--hi);
-  --inset-sm:inset 2px 2px 5px var(--lo),inset -2px -2px 5px var(--hi);
+  --r-lg:18px; --r-md:14px; --r-sm:10px;
+  --raise:0 0 0 1px var(--line);
+  --raise-sm:0 0 0 1px var(--line);
+  --inset:none;
+  --inset-sm:0 0 0 1px var(--line) inset;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#1d2420; --fg:#e2eae4; --muted:#9db0a3; --accent:#8bcfa8; --accent-2:#5f9a78;
-  --hi:#28312c; --lo:#121714; --well:#1a201d; --line:#2c3630;
-  --warn:#e6b46a; --warn-soft:#3a2f1e; --bad:#f1907f; --bad-soft:#3d2420; --ok:#8bcfa8; color-scheme:dark}}
+  --bg:#15191c; --surface:#1d2226; --fg:#e6e9eb; --muted:#a4adb3; --accent:#7cc4a0; --accent-2:#4f8a6c;
+  --well:#191d20; --line:#2b3237;
+  --warn:#e2b46a; --warn-soft:#33291a; --bad:#f0907f; --bad-soft:#3a2320; --ok:#7cc4a0; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#1d2420; --fg:#e2eae4; --muted:#9db0a3; --accent:#8bcfa8; --accent-2:#5f9a78;
-  --hi:#28312c; --lo:#121714; --well:#1a201d; --line:#2c3630;
-  --warn:#e6b46a; --warn-soft:#3a2f1e; --bad:#f1907f; --bad-soft:#3d2420; --ok:#8bcfa8; color-scheme:dark}
+  --bg:#15191c; --surface:#1d2226; --fg:#e6e9eb; --muted:#a4adb3; --accent:#7cc4a0; --accent-2:#4f8a6c;
+  --well:#191d20; --line:#2b3237;
+  --warn:#e2b46a; --warn-soft:#33291a; --bad:#f0907f; --bad-soft:#3a2320; --ok:#7cc4a0; color-scheme:dark}
 
 *{box-sizing:border-box}
 html{background:var(--bg)}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 var(--body);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1040px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left));padding-block:max(20px,env(safe-area-inset-top)) 56px;display:grid;gap:28px}
 .wrap>*{min-width:0}
 h1,h2{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0}
@@ -48,18 +49,18 @@ a{color:var(--accent)}
 .num{font-variant-numeric:tabular-nums}
 
 /* surfaces */
-.raised{background:var(--bg);border-radius:var(--r-lg);box-shadow:var(--raise)}
+.raised{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--raise)}
 .well{background:var(--well);border-radius:var(--r-md);box-shadow:var(--inset)}
 section.raised{padding:22px}
 .sec-head{display:flex;gap:6px 12px;align-items:baseline;flex-wrap:wrap;margin-bottom:16px}
 .sec-head .muted{flex:1 1 220px}
-.tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--accent);background:var(--bg);box-shadow:var(--raise-sm);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--accent);background:var(--surface);box-shadow:var(--raise-sm);border-radius:999px;padding:3px 10px;white-space:nowrap}
 .tag.warn{color:var(--warn)}
 .tag.bad{color:var(--bad)}
 .tag.flat{box-shadow:var(--inset-sm)}
 
 /* controls */
-button{font:inherit;font-size:14px;font-weight:600;color:var(--accent);background:var(--bg);border:0;border-radius:999px;padding:10px 18px;box-shadow:var(--raise-sm);cursor:pointer;transition:box-shadow .15s}
+button{font:inherit;font-size:14px;font-weight:600;color:var(--accent);background:var(--surface);border:0;border-radius:999px;padding:10px 18px;box-shadow:var(--raise-sm);cursor:pointer;transition:box-shadow .15s}
 button:active{box-shadow:var(--inset-sm)}
 button:disabled{opacity:.6;cursor:progress}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
@@ -67,7 +68,7 @@ input[type=search]{font:inherit;color:var(--fg);background:var(--well);border:0;
 input[type=search]::placeholder{color:var(--muted)}
 label.toggle{display:inline-flex;gap:8px;align-items:center;font-size:14px;color:var(--muted);cursor:pointer;white-space:nowrap}
 label.toggle input{appearance:none;width:42px;height:24px;border-radius:999px;background:var(--well);box-shadow:var(--inset-sm);position:relative;cursor:pointer;margin:0}
-label.toggle input::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--bg);box-shadow:2px 2px 4px var(--lo),-1px -1px 3px var(--hi);transition:transform .2s}
+label.toggle input::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
 label.toggle input:checked{background:var(--accent-2)}
 label.toggle input:checked::after{transform:translateX(18px)}
 
@@ -94,7 +95,7 @@ label.toggle input:checked::after{transform:translateX(18px)}
 .queue{display:grid;gap:18px}
 .bucket h3{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
-.qcard{padding:14px 16px;display:grid;gap:6px;border-radius:var(--r-md);box-shadow:var(--raise-sm);background:var(--bg)}
+.qcard{padding:14px 16px;display:grid;gap:6px;border-radius:var(--r-md);box-shadow:var(--raise-sm);background:var(--surface)}
 .qcard .t{font-weight:600}
 .qcard .prompt{font-size:14px}
 .qcard details summary{font-size:13px;color:var(--accent);font-weight:600;cursor:pointer}
@@ -121,7 +122,7 @@ label.toggle input:checked::after{transform:translateX(18px)}
 .chart .cross{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;visibility:hidden}
 .chart .cross.on{visibility:visible}
 .chart .empty{padding:24px 8px;text-align:center;color:var(--muted);font-size:14px}
-.tip{position:absolute;pointer-events:none;background:var(--bg);box-shadow:var(--raise-sm);border-radius:10px;padding:6px 10px;font-size:12px;white-space:nowrap;transform:translate(-50%,-110%);z-index:2}
+.tip{position:absolute;pointer-events:none;background:var(--surface);box-shadow:var(--raise-sm);border-radius:10px;padding:6px 10px;font-size:12px;white-space:nowrap;transform:translate(-50%,-110%);z-index:2}
 .tip b{font-variant-numeric:tabular-nums}
 details.data{margin-top:14px}
 details.data summary{font-size:13px;color:var(--accent);font-weight:600;cursor:pointer}
@@ -162,7 +163,7 @@ details.more>summary{font-size:14px;font-weight:600;color:var(--accent);cursor:p
 /* lessons */
 .toolbar{display:flex;gap:12px 16px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
 #lessons{display:grid;gap:16px}
-.lesson{padding:18px;border-radius:var(--r-md);box-shadow:var(--raise-sm);background:var(--bg);display:grid;gap:6px}
+.lesson{padding:18px;border-radius:var(--r-md);box-shadow:var(--raise-sm);background:var(--surface);display:grid;gap:6px}
 .lesson details summary{cursor:pointer;font-weight:600;color:var(--accent);font-size:14px;margin-top:4px}
 article{max-width:68ch;overflow-wrap:anywhere;margin-top:10px;padding:4px 16px 12px;border-radius:var(--r-sm);background:var(--well);box-shadow:var(--inset-sm)}
 article h3{color:var(--accent);margin:18px 0 4px;font-size:15px}
@@ -171,7 +172,7 @@ article ul,article ol{padding-left:20px;margin:6px 0}
 article blockquote{border-left:3px solid var(--line);margin:8px 0;padding:2px 12px;color:var(--muted)}
 .placeholder{color:var(--muted);font-size:14px}
 .trows{display:grid;gap:10px;margin:8px 0}
-.trow{padding:10px 12px;border-radius:var(--r-sm);background:var(--bg);box-shadow:var(--raise-sm);display:grid;gap:6px}
+.trow{padding:10px 12px;border-radius:var(--r-sm);background:var(--surface);box-shadow:var(--raise-sm);display:grid;gap:6px}
 .trow p{margin:0;font-size:14px}
 .trow .muted{font-size:12px}
 
@@ -207,6 +208,7 @@ article blockquote{border-left:3px solid var(--line);margin:8px 0;padding:2px 12
     <p class="sub">하루 25분 · 일상 60% / 비즈니스 40% · B1–B2 → C1</p>
     <div class="row">
       <button id="refresh" type="button">새로고침</button>
+      <button id="theme" type="button" aria-label="화면 테마 바꾸기">테마: 자동</button>
       <a href="https://app.notion.com/p/3f56e2811b6881e6ba9ee806bb52c525" target="_blank" rel="noopener">Notion 원본 열기 ↗</a>
     </div>
     <div class="sync" id="sync" data-state="loading" role="status" aria-live="polite"><span class="dot" aria-hidden="true"></span><span id="sync-text"><b>불러오는 중</b> · 최신 데이터를 읽고 있습니다.</span></div>
@@ -501,6 +503,17 @@ function makeDemo(){
   const reviews=[{id:'r1',title:'D1 — catch up with',status:'Planned',stage:'D1',scheduled:t,expression:['demo-ecatch up with']},{id:'r2',title:'D7 — run late',status:'Assessed',stage:'D7',scheduled:D(13),actual:D(13),score:3,hintUsed:false,evidence:'예시'},{id:'r3',title:'D14 — on the same page',status:'Assessed',stage:'D14',scheduled:D(11),actual:D(11),score:2,hintUsed:false,evidence:'예시'},{id:'r4',title:'D3 — get used to',status:'Assessed',stage:'D3',scheduled:D(7),actual:D(7),score:1,hintUsed:true,evidence:'예시'}];
   return {generatedAt:new Date().toISOString(),lessons,expressions,reviews};
 }
+
+// 테마: 자동(휴대폰 설정 따라 낮=종이책 / 밤=딤 다크) → 낮 고정 → 밤 고정
+const THEME_LABEL={auto:'테마: 자동',light:'테마: 낮',dark:'테마: 밤'};
+let theme=document.documentElement.dataset.theme||'auto';
+function applyTheme(){
+  if(theme==='auto')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=theme;
+  $('#theme').textContent=THEME_LABEL[theme];
+  try{theme==='auto'?localStorage.removeItem('theme'):localStorage.setItem('theme',theme)}catch(e){}
+}
+$('#theme').addEventListener('click',()=>{theme={auto:'light',light:'dark',dark:'auto'}[theme];applyTheme()});
+applyTheme();
 
 if(DEMO)$('#demo-banner').hidden=false;
 $('#search').addEventListener('input',renderLessons);
