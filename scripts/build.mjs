@@ -74,6 +74,17 @@ async function blocks(id, depth = 0) {
   do {
     const r = await notion(`/blocks/${id}/children?page_size=100${cursor ? `&start_cursor=${cursor}` : ''}`);
     for (const b of r.results) {
+      if (b.type === 'table') {
+        const rows = [];
+        let c2;
+        do {
+          const tr = await notion(`/blocks/${b.id}/children?page_size=100${c2 ? `&start_cursor=${c2}` : ''}`);
+          for (const row of tr.results) if (row.type === 'table_row') rows.push(row.table_row.cells.map(plain));
+          c2 = tr.has_more ? tr.next_cursor : undefined;
+        } while (c2);
+        if (rows.length) out.push({ t: 'table', header: !!b.table.has_column_header, rows, d: depth });
+        continue;
+      }
       const kind = BLOCK_KIND[b.type];
       const text = kind ? plain(b[b.type].rich_text) : '';
       if (kind && text.trim()) out.push({ t: kind, text, d: depth });
@@ -112,6 +123,15 @@ function corrections(body) {
   let heading = '', cur = null;
   for (const b of body) {
     if (b.t === 'h') { heading = b.text; continue; }
+    // 표 형식 교정: 머리행이 Original… / Natural… / Why… 인 표
+    if (b.t === 'table') {
+      const [head, ...rows] = b.rows;
+      const col = re => head.findIndex(h => re.test(h));
+      const o = col(/original|원문/i), n = col(/natural|자연/i), w = col(/why|이유/i);
+      if (b.header && o >= 0 && n >= 0) for (const r of rows) if (r[o]) out.push({ heading, original: r[o].replace(/^[“"]|[”"]$/g, '').trim(), natural: (r[n] || '').replace(/^[“"]|[”"]$/g, '').trim(), why: w >= 0 ? r[w] : '' });
+      continue;
+    }
+    if (!b.text) continue;
     const m = b.text.match(/^\s*(Original|원문|Natural Version|자연스러운 표현|Why|이유)\s*[:：]\s*(.*)$/is);
     if (!m) continue;
     const key = m[1].toLowerCase();
@@ -123,7 +143,7 @@ function corrections(body) {
 }
 
 function analyze(lesson, expressionsBefore) {
-  const lines = lesson.body.filter(b => LEARNER.test(b.text)).map(b => b.text.replace(LEARNER, ''));
+  const lines = lesson.body.filter(b => b.text && LEARNER.test(b.text)).map(b => b.text.replace(LEARNER, ''));
   const tokens = lines.flatMap(words);
   const text = lines.join('\n');
   const matched = expressionsBefore.filter(e => e.pattern && e.pattern.test(text)).map(e => e.title);
