@@ -14,7 +14,7 @@
 /* Layout: one reading column. Day = paper (warm off-white, ink text, hairline cards). Night = dim (blue-grey, not pure black). */
 :root{
   --bg:#f8f7f3; --surface:#ffffff; --fg:#1c1c1a; --muted:#5b5a55; --accent:#1f5c43; --accent-2:#6a9b81;
-  --well:#f3f1ec; --line:#e3e0d8; --on-accent:#ffffff;
+  --well:#f3f1ec; --line:#e3e0d8; --on-accent:#ffffff; --accent-soft:#e5efe9; --strike:#e6b9b1;
   --warn:#8a5a12; --warn-soft:#f6ead6; --bad:#a83a2c; --bad-soft:#f6dfdb; --ok:#1f5c43;
   --display:"Gowun Batang",Georgia,serif;
   --body:"IBM Plex Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
@@ -26,11 +26,11 @@
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#15191c; --surface:#1d2226; --fg:#e6e9eb; --muted:#a4adb3; --accent:#7cc4a0; --accent-2:#4f8a6c;
-  --well:#191d20; --line:#2b3237; --on-accent:#0f2419;
+  --well:#191d20; --line:#2b3237; --on-accent:#0f2419; --accent-soft:#213229; --strike:#7a4b44;
   --warn:#e2b46a; --warn-soft:#33291a; --bad:#f0907f; --bad-soft:#3a2320; --ok:#7cc4a0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#15191c; --surface:#1d2226; --fg:#e6e9eb; --muted:#a4adb3; --accent:#7cc4a0; --accent-2:#4f8a6c;
-  --well:#191d20; --line:#2b3237; --on-accent:#0f2419;
+  --well:#191d20; --line:#2b3237; --on-accent:#0f2419; --accent-soft:#213229; --strike:#7a4b44;
   --warn:#e2b46a; --warn-soft:#33291a; --bad:#f0907f; --bad-soft:#3a2320; --ok:#7cc4a0; color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -101,7 +101,7 @@ label.toggle input:checked::after{transform:translateX(18px)}
 .qcard details summary{font-size:13px;color:var(--accent);font-weight:600;cursor:pointer}
 .qcard details[open]{border-radius:var(--r-sm)}
 .qcard details p{font-size:14px;margin-top:6px;padding:8px 10px;border-radius:var(--r-sm);background:var(--well);box-shadow:var(--inset-sm)}
-.qcard s{color:var(--muted)}
+.qcard s{color:var(--muted);text-decoration-color:var(--strike);text-decoration-thickness:1.5px}
 
 /* ② trend charts */
 .charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
@@ -173,11 +173,41 @@ details.more>summary{font-size:14px;font-weight:600;color:var(--accent);cursor:p
 .lesson details summary .close,.lesson details[open] summary .open{display:none}
 .lesson details[open] summary .close{display:inline}
 @media(max-width:640px){.lesson details summary{display:flex;justify-content:center;width:100%}}
-article{max-width:68ch;overflow-wrap:anywhere;margin-top:10px;padding:4px 16px 12px;border-radius:var(--r-sm);background:var(--well);box-shadow:var(--inset-sm)}
-article h3{color:var(--accent);margin:18px 0 4px;font-size:15px}
+article{max-width:68ch;overflow-wrap:anywhere;margin-top:14px;font-size:15px}
 article p{margin:6px 0}
-article ul,article ol{padding-left:20px;margin:6px 0}
-article blockquote{border-left:3px solid var(--line);margin:8px 0;padding:2px 12px;color:var(--muted)}
+article ul{padding-left:20px;margin:6px 0}
+article blockquote{border-left:3px solid var(--line);border-radius:0;margin:8px 0;padding:2px 12px;color:var(--muted)}
+article .sec{display:flex;align-items:center;gap:10px;margin:24px 0 10px}
+article .sec:first-child{margin-top:4px}
+article .sec h3{font-family:var(--display);font-size:17px;color:var(--fg);margin:0}
+article .no{flex:none;font-size:11.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:2px 10px;font-variant-numeric:tabular-nums}
+article .kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;margin:8px 0}
+article .kv>span{font-size:11.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:2px 10px;margin-top:2px;white-space:nowrap}
+article .fix{background:var(--surface);box-shadow:var(--raise-sm);border-radius:var(--r-sm);padding:12px 14px;margin:10px 0;display:grid;gap:6px}
+article .fix i{font-style:normal;font-weight:700;margin-right:8px}
+article .fix .o{color:var(--muted)}
+article .fix .o s{text-decoration-color:var(--strike);text-decoration-thickness:1.5px}
+article .fix .o i{color:var(--strike)}
+article .fix .n{font-weight:600;color:var(--fg)}
+article .fix .n i{color:var(--accent)}
+article .fix .w{font-size:13px;color:var(--muted);background:var(--well);border-radius:8px;padding:7px 10px}
+article .fix .kv{margin:2px 0;font-size:14px}
+article .xp{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:8px 0}
+article .xp>div{background:var(--accent-soft);border-radius:var(--r-sm);padding:12px 14px;display:grid;gap:2px}
+article .xp b{color:var(--accent);font-size:16px}
+article .xp .mn{font-size:13px}
+article .xp em{font-size:13px;color:var(--muted)}
+article ol.rc{list-style:none;counter-reset:n;padding:0;margin:8px 0;display:grid;gap:8px}
+article ol.rc li{counter-increment:n;display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;align-items:center;background:var(--surface);box-shadow:var(--raise-sm);border-radius:var(--r-sm);padding:10px 14px}
+article ol.rc li::before{content:counter(n);width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:12px;font-weight:600}
+article .qq{background:var(--well);border-left:3px solid var(--accent);border-radius:0;padding:10px 14px;margin:8px 0}
+article .qq span{font-size:12px;font-weight:700;color:var(--accent);margin-right:8px}
+article .chat{display:grid;gap:8px;margin:10px 0}
+article .bub{max-width:85%;padding:9px 13px;border-radius:16px;font-size:14.5px}
+article .bub small{display:block;font-size:11px;color:var(--muted)}
+article .bub.coach{background:var(--well);justify-self:start;border-bottom-left-radius:4px}
+article .bub.me{background:var(--accent-soft);justify-self:end;border-bottom-right-radius:4px}
+article .note{font-size:13px;color:var(--muted)}
 .placeholder{color:var(--muted);font-size:14px}
 .trows{display:grid;gap:10px;margin:8px 0}
 .trow{padding:10px 12px;border-radius:var(--r-sm);background:var(--surface);box-shadow:var(--raise-sm);display:grid;gap:6px}
@@ -467,19 +497,60 @@ function renderBook(exprs,t){
     (master.length?'<details class="more"><summary>숙달한 표현 '+master.length+'개 · 복습에서 제외됨</summary><div class="tablewrap"><table><thead><tr><th>표현·의미</th><th>예문</th></tr></thead><tbody>'+master.map(e=>'<tr>'+td('표현',link(e.url,e.title)+'<br><span class="meaning">'+esc(clean(e.meaning))+'</span>')+td('예문',esc(e.example))+'</tr>').join('')+'</tbody></table></div></details>':'');
 }
 
+// 레슨 본문: 섹션 번호 배지 · 교정 카드 · 표현 카드 · 연습 번호 카드 · 질문 상자 · 대화 말풍선
 function body(blocks){
   if(!blocks||!blocks.length)return '<p class="placeholder">본문이 비어 있습니다.</p>';
-  let out='',list=null;const close=()=>{if(list){out+='</'+list+'>';list=null}};
+  const e=s=>esc(s).replace(/\n/g,'<br>'),unq=s=>String(s??'').replace(/^\s*[“"]|[”"]\s*$/g,'').trim();
+  const fixCard=(o,n,w)=>'<div class="fix">'+(o?'<div class="o"><i>✗</i><s>'+e(unq(o))+'</s></div>':'')+(n?'<div class="n"><i>✓</i>'+e(unq(n))+'</div>':'')+(w?'<div class="w">'+e(w)+'</div>':'')+'</div>';
+  let out='',list=null,chat=false,fix=null,sec='';
+  const endFix=()=>{if(fix){out+='<div class="fix">'+fix.join('')+'</div>';fix=null}};
+  const endList=()=>{if(list){out+='</'+list+'>';list=null}};
+  const endChat=()=>{if(chat){out+='</div>';chat=false}};
+  const close=()=>{endFix();endList();endChat()};
   for(const b of blocks){
     if(b.t==='table'){
       close();
       const [head,...rows]=b.header?b.rows:[[],...b.rows];
-      out+='<div class="trows">'+rows.map(r=>'<div class="trow">'+r.map((c,i)=>c?'<p>'+(head[i]?'<span class="muted">'+esc(head[i])+'</span><br>':'')+esc(c)+'</p>':'').join('')+'</div>').join('')+'</div>';
+      const col=re=>head.findIndex(h=>re.test(h));
+      const o=col(/original|원문/i),n=col(/natural|자연/i),w=col(/why|이유/i),x=col(/expression|표현/i),mn=col(/meaning|뜻|의미/i),ex=col(/example|예문/i);
+      if(o>=0&&n>=0)out+=rows.map(r=>fixCard(r[o],r[n],w>=0?r[w]:'')).join('');
+      else if(x>=0)out+='<div class="xp">'+rows.map(r=>'<div><b>'+e(r[x])+'</b>'+(mn>=0&&r[mn]?'<span class="mn">'+e(r[mn])+'</span>':'')+(ex>=0&&r[ex]?'<em>'+e(r[ex])+'</em>':'')+'</div>').join('')+'</div>';
+      else out+='<div class="trows">'+rows.map(r=>'<div class="trow">'+r.map((c,i)=>c?'<p>'+(head[i]?'<span class="muted">'+e(head[i])+'</span><br>':'')+e(c)+'</p>':'').join('')+'</div>').join('')+'</div>';
       continue;
     }
-    const t=esc(b.text).replace(/\n/g,'<br>');
-    if(b.t==='ul'||b.t==='ol'){if(list!==b.t){close();out+='<'+b.t+'>';list=b.t}out+='<li>'+t+'</li>';continue}
-    close();out+=b.t==='h'?'<h3>'+t+'</h3>':b.t==='quote'?'<blockquote>'+t+'</blockquote>':'<p>'+t+'</p>';
+    const raw=b.text||'';let m;
+    if(b.t==='h'){
+      close();sec=raw;m=raw.match(/^\s*(\d{1,2})[.)]\s*(.+)$/);
+      out+='<div class="sec">'+(m?'<span class="no">'+esc(m[1].padStart(2,'0'))+'</span>':'')+'<h3>'+e(m?m[2]:raw)+'</h3></div>';continue;
+    }
+    if((m=raw.match(/^\s*(coach|tutor|teacher|코치|learner|me|나|학습자)\s*[:：]\s*([\s\S]*)$/i))){
+      endFix();endList();
+      if(!chat){out+='<div class="chat">';chat=true}
+      const me=/^(learner|me|나|학습자)$/i.test(m[1]);
+      out+='<div class="bub '+(me?'me':'coach')+'"><small>'+(me?'나':'Coach')+'</small>'+e(m[2])+'</div>';continue;
+    }
+    if((m=raw.match(/^\s*(Original|원문|Natural Version|Natural|자연스러운 표현|Why|이유|Better Expressions?|Try Again)\s*[:：]\s*([\s\S]*)$/i))){
+      endList();endChat();
+      const k=m[1].toLowerCase(),v=m[2];
+      if(k==='original'||k==='원문'){endFix();fix=['<div class="o"><i>✗</i><s>'+e(unq(v))+'</s></div>']}
+      else{
+        fix=fix||[];
+        if(k.startsWith('natural')||k==='자연스러운 표현')fix.push('<div class="n"><i>✓</i>'+e(unq(v))+'</div>');
+        else if(k==='why'||k==='이유')fix.push('<div class="w">'+e(v)+'</div>');
+        else fix.push('<div class="kv"><span>'+esc(m[1])+'</span><div>'+e(v)+'</div></div>');
+      }
+      continue;
+    }
+    if(b.t==='ul'||b.t==='ol'){
+      endFix();endChat();
+      if(list!==b.t){endList();out+='<'+b.t+(b.t==='ol'?' class="rc"':'')+'>';list=b.t}
+      out+='<li>'+e(raw)+'</li>';continue;
+    }
+    close();
+    if((m=raw.match(/^\s*Q(\d+)[.)]?\s+([\s\S]*)$/))){out+='<div class="qq"><span>Q'+m[1]+'</span>'+e(m[2])+'</div>';continue}
+    if(/evidence|limitation|근거|한계/i.test(sec)){out+='<p class="note">'+e(raw)+'</p>';continue}
+    if((m=raw.match(/^\s*([A-Za-z][A-Za-z ]{1,24}|[가-힣 ]{2,12})\s*[:：]\s+([\s\S]+)$/))){out+='<div class="kv"><span>'+esc(m[1].trim())+'</span><div>'+e(m[2])+'</div></div>';continue}
+    out+=b.t==='quote'?'<blockquote>'+e(raw)+'</blockquote>':'<p>'+e(raw)+'</p>';
   }
   close();return out;
 }
