@@ -14,7 +14,7 @@
 /* Layout: one reading column. Day = paper (warm off-white, ink text, hairline cards). Night = dim (blue-grey, not pure black). */
 :root{
   --bg:#f8f7f3; --surface:#ffffff; --fg:#1c1c1a; --muted:#5b5a55; --accent:#1f5c43; --accent-2:#6a9b81;
-  --well:#f3f1ec; --line:#e3e0d8;
+  --well:#f3f1ec; --line:#e3e0d8; --on-accent:#ffffff;
   --warn:#8a5a12; --warn-soft:#f6ead6; --bad:#a83a2c; --bad-soft:#f6dfdb; --ok:#1f5c43;
   --display:"Gowun Batang",Georgia,serif;
   --body:"IBM Plex Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
@@ -26,11 +26,11 @@
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#15191c; --surface:#1d2226; --fg:#e6e9eb; --muted:#a4adb3; --accent:#7cc4a0; --accent-2:#4f8a6c;
-  --well:#191d20; --line:#2b3237;
+  --well:#191d20; --line:#2b3237; --on-accent:#0f2419;
   --warn:#e2b46a; --warn-soft:#33291a; --bad:#f0907f; --bad-soft:#3a2320; --ok:#7cc4a0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#15191c; --surface:#1d2226; --fg:#e6e9eb; --muted:#a4adb3; --accent:#7cc4a0; --accent-2:#4f8a6c;
-  --well:#191d20; --line:#2b3237;
+  --well:#191d20; --line:#2b3237; --on-accent:#0f2419;
   --warn:#e2b46a; --warn-soft:#33291a; --bad:#f0907f; --bad-soft:#3a2320; --ok:#7cc4a0; color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -164,7 +164,15 @@ details.more>summary{font-size:14px;font-weight:600;color:var(--accent);cursor:p
 .toolbar{display:flex;gap:12px 16px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
 #lessons{display:grid;gap:16px}
 .lesson{padding:18px;border-radius:var(--r-md);box-shadow:var(--raise-sm);background:var(--surface);display:grid;gap:6px}
-.lesson details summary{cursor:pointer;font-weight:600;color:var(--accent);font-size:14px;margin-top:4px}
+.lesson details summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:11px 20px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:15px;transition:filter .15s}
+.lesson details summary::-webkit-details-marker{display:none}
+.lesson details summary:hover{filter:brightness(1.08)}
+.lesson details summary .chev{display:inline-block;transition:transform .2s}
+.lesson details[open] summary{background:var(--surface);color:var(--accent);box-shadow:0 0 0 1.5px var(--accent) inset}
+.lesson details[open] summary .chev{transform:rotate(90deg)}
+.lesson details summary .close,.lesson details[open] summary .open{display:none}
+.lesson details[open] summary .close{display:inline}
+@media(max-width:640px){.lesson details summary{display:flex;justify-content:center;width:100%}}
 article{max-width:68ch;overflow-wrap:anywhere;margin-top:10px;padding:4px 16px 12px;border-radius:var(--r-sm);background:var(--well);box-shadow:var(--inset-sm)}
 article h3{color:var(--accent);margin:18px 0 4px;font-size:15px}
 article p{margin:6px 0}
@@ -479,7 +487,7 @@ function renderLessons(){
   const q=$('#search').value.trim().toLowerCase(),showAll=$('#samples').checked;
   const vis=r=>(showAll||!HIDDEN.has(r.status))&&(!q||JSON.stringify(r).toLowerCase().includes(q));
   const ls=data.lessons.filter(vis);
-  $('#lessons').innerHTML=ls.map(r=>'<div class="lesson"><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="tag'+(HIDDEN.has(r.status)?' flat':'')+'">'+esc(statusLabel[r.status]||r.status||'상태 없음')+'</span>'+(r.errorTypes||[]).map(t=>'<span class="tag warn flat">'+esc(t)+'</span>').join('')+'</div><h3>'+esc(clean(r.title)||'제목 없음')+'</h3><p class="muted">'+[esc(d10(r.date)||'날짜 없음'),{Daily:'일상',Business:'비즈니스',Mixed:'혼합'}[r.area]||'',esc(r.mode||''),Number.isFinite(r.minutes)?r.minutes+'분':''].filter(Boolean).join(' · ')+'</p><details data-id="'+esc(r.id)+'"><summary>레슨 본문 읽기</summary><article>'+body(r.body)+'</article></details><p style="font-size:14px">'+link(r.url,'Notion 원본 보기')+'</p></div>').join('')||'<p class="placeholder">'+(data.lessons.length?'검색 조건에 맞는 레슨이 없습니다.':'아직 레슨이 없습니다.')+'</p>';
+  $('#lessons').innerHTML=ls.map(r=>'<div class="lesson"><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="tag'+(HIDDEN.has(r.status)?' flat':'')+'">'+esc(statusLabel[r.status]||r.status||'상태 없음')+'</span>'+(r.errorTypes||[]).map(t=>'<span class="tag warn flat">'+esc(t)+'</span>').join('')+'</div><h3>'+esc(clean(r.title)||'제목 없음')+'</h3><p class="muted">'+[esc(d10(r.date)||'날짜 없음'),{Daily:'일상',Business:'비즈니스',Mixed:'혼합'}[r.area]||'',esc(r.mode||''),Number.isFinite(r.minutes)?r.minutes+'분':''].filter(Boolean).join(' · ')+'</p><details data-id="'+esc(r.id)+'"><summary><span class="chev" aria-hidden="true">▶</span><span class="open">레슨 본문 읽기</span><span class="close">본문 접기</span></summary><article>'+body(r.body)+'</article></details><p style="font-size:14px">'+link(r.url,'Notion 원본 보기')+'</p></div>').join('')||'<p class="placeholder">'+(data.lessons.length?'검색 조건에 맞는 레슨이 없습니다.':'아직 레슨이 없습니다.')+'</p>';
   document.querySelectorAll('#lessons details').forEach(d=>{if(openSet.has(d.dataset.id))d.open=true;d.addEventListener('toggle',()=>d.open?openSet.add(d.dataset.id):openSet.delete(d.dataset.id))});
 }
 function renderReviews(){
